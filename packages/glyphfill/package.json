@@ -1,6 +1,6 @@
 {
   "name": "glyphfill",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Show progress inside a word: letters get heavier, or fill with ink, as a task completes. For React, Vue, Svelte and plain JavaScript.",
   "keywords": [
     "progress",
