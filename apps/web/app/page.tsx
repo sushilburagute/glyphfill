@@ -1,55 +1,70 @@
 import { GlyphFill } from 'glyphfill/react';
-import { CodeBlock, CopyButton } from './components/CopyButton';
+import { AiPrompt } from './components/AiPrompt';
+import { CodeTabs } from './components/CodeTabs';
 import { HeroWord } from './components/Hero';
+import { InstallCommand } from './components/InstallCommand';
 import { ModeCompare } from './components/ModeCompare';
 import { Playground } from './components/Playground';
-
-const INSTALL = 'npm install glyphfill';
-
-const REACT_EXAMPLE = `import { GlyphFill } from 'glyphfill/react';
-import 'glyphfill/styles.css';
-
-export function Usage({ used }: { used: number }) {
-  return <GlyphFill value={used}>USAGE</GlyphFill>;
-}`;
-
-const VANILLA_EXAMPLE = `import { glyphfill } from 'glyphfill';
-import 'glyphfill/styles.css';
-
-const el = document.getElementById('usage');
-const word = glyphfill(el, { value: 40 });
-
-// letters animate to the new value
-word.update({ value: 75 });
-
-// puts the original text back
-word.destroy();`;
+import { AUTHOR, DESCRIPTION, GITHUB_URL, NPM_URL, SITE_URL } from './lib/site';
+import { FRAMEWORK_TABS, STACK_TABS } from './lib/snippets';
 
 const OPTIONS = [
-  ['value', 'number', 'required', 'Percent complete, from 0 to 100.'],
+  ['value', 'number', 'none', 'Percent complete, from 0 to 100. Leave it out to show a loading animation.'],
   ['mode', "'sweep' | 'fill' | 'weight'", "'sweep'", 'How the progress is drawn.'],
   ['minWeight', 'number', '100', 'Weight of the unfilled letters.'],
   ['maxWeight', 'number', '900', 'Weight of the filled letters.'],
+  ['fillColor', 'string', 'none', 'Any CSS color. Filled letters change to it.'],
   ['duration', 'number', '300', 'Transition length in ms. Turned off when the reader prefers reduced motion.'],
   [
     'tooltip',
     'boolean | string | (word, pct) => string',
     'true',
-    'Text shown on hover and focus. Pass false to hide it.',
+    'Text shown on hover and focus. Pass false to hide it. pct is null while loading.',
   ],
+  ['text', 'string', 'children', 'The word, for Svelte and plain JavaScript. React and Vue read it from children.'],
 ] as const;
+
+const HOOKS = [
+  ['--gf-fill', 'CSS variable', 'Fill color. Same as the fillColor option.'],
+  ['--gf-tip-bg', 'CSS variable', 'Tooltip background.'],
+  ['--gf-tip-fg', 'CSS variable', 'Tooltip text color.'],
+  ['--gf-stroke', 'CSS variable', 'Outline width in fill mode.'],
+  ['data-gf-state', 'attribute', 'loading, progress or complete. Style the finished state with it.'],
+  ['data-gf-mode', 'attribute', 'sweep, fill or weight.'],
+] as const;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareSourceCode',
+  name: 'glyphfill',
+  description: DESCRIPTION,
+  url: SITE_URL,
+  codeRepository: GITHUB_URL,
+  programmingLanguage: ['TypeScript', 'JavaScript'],
+  runtimePlatform: 'Web browser',
+  license: 'https://opensource.org/licenses/MIT',
+  keywords: 'progress, typography, variable fonts, React, Vue, Svelte, Tailwind CSS',
+  author: { '@type': 'Person', name: AUTHOR.name, url: AUTHOR.url },
+};
 
 export default function Home() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: static JSON-LD with < escaped
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
+      />
+
       <header className="site-header wrap">
         <a className="logo" href="/">
           glyphfill
         </a>
         <nav className="site-nav" aria-label="Main">
           <a href="#playground">Playground</a>
-          <a href="#usage">Usage</a>
-          <a href="https://www.npmjs.com/package/glyphfill">npm</a>
+          <a href="#usage">Docs</a>
+          <a href={GITHUB_URL}>GitHub</a>
+          <a href={NPM_URL}>npm</a>
         </nav>
       </header>
 
@@ -60,25 +75,22 @@ export default function Home() {
             <div>
               <h1 id="hero-title">Show progress inside a word.</h1>
               <p>
-                glyphfill makes letters heavier, or fills them with ink, as a task gets done. Use it in React or plain
-                JavaScript.
+                glyphfill makes letters heavier, or fills them with ink, as a task gets done. Use it in React, Vue,
+                Svelte or plain JavaScript.
               </p>
             </div>
-            <div className="install">
-              <code>{INSTALL}</code>
-              <CopyButton text={INSTALL} />
-            </div>
+            <InstallCommand />
           </div>
         </section>
 
         <section className="section wrap" aria-labelledby="inline-title">
           <h2 id="inline-title">Fits in a sentence</h2>
           <p className="sentence">
-            Your <GlyphFill value={72}>storage</GlyphFill> is filling up, but this month&rsquo;s{' '}
+            Your <GlyphFill value={72}>storage</GlyphFill> is filling up, this month&rsquo;s{' '}
             <GlyphFill value={35} mode="fill">
               budget
             </GlyphFill>{' '}
-            is on track.
+            is on track, and your <GlyphFill>report</GlyphFill> is still loading.
           </p>
           <p className="note">Hover over a word, or Tab to it, to see its exact progress.</p>
         </section>
@@ -95,20 +107,23 @@ export default function Home() {
           <ModeCompare />
         </section>
 
+        <section className="section wrap" id="stack" aria-labelledby="stack-title">
+          <h2 id="stack-title">Works with your stack</h2>
+          <p className="lede">
+            glyphfill only styles its own classes, with zero specificity, so your utility classes, themes and styled()
+            wrappers win. The word takes your font, size and color.
+          </p>
+          <CodeTabs tabs={STACK_TABS} label="UI libraries" />
+        </section>
+
         <section className="section wrap" id="usage" aria-labelledby="usage-title">
           <h2 id="usage-title">Usage</h2>
           <div className="docs">
             <div>
               <h3>Install</h3>
-              <CodeBlock code={INSTALL} />
-              <h3>React</h3>
-              <p className="note">
-                The component has no hooks or effects, so it renders on the server and works in React Server Components.
-              </p>
-              <CodeBlock code={REACT_EXAMPLE} />
-              <h3>JavaScript</h3>
-              <p className="note">Point it at any element. It reads the element&rsquo;s text and takes it over.</p>
-              <CodeBlock code={VANILLA_EXAMPLE} />
+              <InstallCommand />
+              <h3>Use it</h3>
+              <CodeTabs tabs={FRAMEWORK_TABS} label="Frameworks" syncFramework />
             </div>
             <div>
               <h3>Fonts</h3>
@@ -118,14 +133,14 @@ export default function Home() {
               </p>
               <h3>Styling</h3>
               <p>
-                The word inherits your font, size and color. Set <code>--gf-tip-bg</code> and <code>--gf-tip-fg</code>{' '}
-                to color the tooltip, and <code>--gf-stroke</code> to change the outline width in fill mode.
+                The word inherits your font, size and color. Override anything with your own classes, or use the CSS
+                variables and attributes below.
               </p>
               <h3>Accessibility</h3>
               <p>
                 Each word is a progress bar with a value, so screen readers announce it as &ldquo;storage, 72%
-                completed&rdquo;. When the tooltip is on, the word can be reached with Tab. Animations turn off when the
-                reader prefers reduced motion.
+                completed&rdquo;, or as loading. When the tooltip is on, the word can be reached with Tab. Animations
+                turn off when the reader prefers reduced motion.
               </p>
             </div>
             <div className="docs-wide">
@@ -158,14 +173,54 @@ export default function Home() {
                   </tbody>
                 </table>
               </div>
+              <h3>CSS variables and attributes</h3>
+              <div className="table-scroll">
+                <table>
+                  <thead>
+                    <tr>
+                      <th scope="col">Name</th>
+                      <th scope="col">Kind</th>
+                      <th scope="col">What it does</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {HOOKS.map(([name, kind, what]) => (
+                      <tr key={name}>
+                        <td>
+                          <code>{name}</code>
+                        </td>
+                        <td>{kind}</td>
+                        <td>{what}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
+        </section>
+
+        <section className="section wrap" id="ai" aria-labelledby="ai-title">
+          <h2 id="ai-title">Add it with an AI assistant</h2>
+          <p className="lede">
+            Paste this into Claude Code, Cursor, Copilot or any coding assistant. It points the assistant at{' '}
+            <a href="/llms-full.txt">llms-full.txt</a>, the full docs as plain text. There is also a shorter{' '}
+            <a href="/llms.txt">llms.txt</a>.
+          </p>
+          <AiPrompt />
         </section>
       </main>
 
       <footer className="site-footer wrap">
-        <span>glyphfill is MIT licensed.</span>
-        <a href="https://www.npmjs.com/package/glyphfill">glyphfill on npm</a>
+        <p>
+          Made by <a href={AUTHOR.url}>{AUTHOR.name}</a>. MIT licensed.
+        </p>
+        <nav className="footer-nav" aria-label="Project">
+          <a href={GITHUB_URL}>GitHub</a>
+          <a href={NPM_URL}>npm</a>
+          <a href="/llms.txt">llms.txt</a>
+          <a href={AUTHOR.url}>sush.dev</a>
+        </nav>
       </footer>
     </>
   );

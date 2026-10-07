@@ -9,6 +9,7 @@
     "typecheck": "next typegen && tsc --noEmit"
   },
   "dependencies": {
+    "@next/third-parties": "16.4.0",
     "glyphfill": "workspace:*",
     "next": "^16.4.0",
     "react": "19.3.0",

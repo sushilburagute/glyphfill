@@ -1,16 +1,33 @@
 {
   "name": "glyphfill",
   "version": "0.0.0",
-  "description": "Show progress inside a word: letters get heavier, or fill with ink, as a task completes.",
+  "description": "Show progress inside a word: letters get heavier, or fill with ink, as a task completes. For React, Vue, Svelte and plain JavaScript.",
   "keywords": [
     "progress",
     "progress-bar",
+    "loading",
     "typography",
     "variable-font",
     "font-weight",
     "text",
-    "react"
+    "react",
+    "vue",
+    "svelte",
+    "tailwind"
   ],
+  "homepage": "https://glyphfill.sush.dev",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sushilburagute/glyphfill.git",
+    "directory": "packages/glyphfill"
+  },
+  "bugs": {
+    "url": "https://github.com/sushilburagute/glyphfill/issues"
+  },
+  "author": {
+    "name": "Sushil Buragute",
+    "url": "https://sush.dev"
+  },
   "license": "MIT",
   "type": "module",
   "sideEffects": [
@@ -43,36 +60,61 @@
         "default": "./dist/react.cjs"
       }
     },
+    "./vue": {
+      "import": {
+        "types": "./dist/vue.d.ts",
+        "default": "./dist/vue.js"
+      },
+      "require": {
+        "types": "./dist/vue.d.cts",
+        "default": "./dist/vue.cjs"
+      }
+    },
+    "./svelte": {
+      "types": "./dist/svelte/index.d.ts",
+      "svelte": "./dist/svelte/index.js"
+    },
     "./styles.css": "./dist/styles.css",
     "./package.json": "./package.json"
   },
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
+    "build": "tsup && node scripts/copy-assets.mjs",
+    "dev": "tsup --watch --onSuccess \"node scripts/copy-assets.mjs\"",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "check": "publint && attw --pack . --profile node16 --exclude-entrypoints styles.css"
+    "check": "publint && attw --pack . --profile node16 --exclude-entrypoints styles.css svelte"
   },
   "peerDependencies": {
-    "react": ">=18"
+    "react": ">=18",
+    "svelte": ">=5",
+    "vue": ">=3.3"
   },
   "peerDependenciesMeta": {
     "react": {
+      "optional": true
+    },
+    "svelte": {
+      "optional": true
+    },
+    "vue": {
       "optional": true
     }
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
+    "@sveltejs/vite-plugin-svelte": "^7.3.1",
     "@testing-library/react": "^16.3.3",
     "@types/node": "^24.19.1",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "jsdom": "^30.1.2",
     "publint": "^0.3.25",
-    "react": ">=18",
+    "react": "^19.3.0",
     "react-dom": "^19.3.0",
+    "svelte": "^5.57.2",
     "tsup": "^8.5.1",
     "typescript": "^6.0.3",
-    "vitest": "^5.0.3"
+    "vitest": "^5.0.3",
+    "vue": "^3.5.43"
   }
 }

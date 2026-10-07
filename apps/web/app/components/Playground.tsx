@@ -3,13 +3,13 @@
 import type { Mode } from 'glyphfill/react';
 import { GlyphFill } from 'glyphfill/react';
 import { useId, useState } from 'react';
-import { CodeBlock } from './CopyButton';
+import { type CodeTab, CodeTabs } from './CodeTabs';
 
 const FONTS = [
   { label: 'Big Shoulders', css: 'var(--font-display)', note: '100–900' },
+  { label: 'Bricolage Grotesque', css: 'var(--font-text)', note: '200–800' },
   { label: 'Fraunces', css: 'var(--font-fraunces)', note: '100–900' },
   { label: 'Inter', css: 'var(--font-inter)', note: '100–900' },
-  { label: 'Recursive', css: 'var(--font-text)', note: '300–1000' },
 ] as const;
 
 const MODES: Mode[] = ['sweep', 'fill', 'weight'];
@@ -17,11 +17,14 @@ const MODES: Mode[] = ['sweep', 'fill', 'weight'];
 interface State {
   word: string;
   value: number;
+  loading: boolean;
   mode: Mode;
   font: number;
   minWeight: number;
   maxWeight: number;
   duration: number;
+  useFill: boolean;
+  fillColor: string;
   showTooltip: boolean;
   tooltipText: string;
 }
@@ -29,60 +32,103 @@ interface State {
 const INITIAL: State = {
   word: 'USAGE',
   value: 40,
+  loading: false,
   mode: 'sweep',
   font: 0,
   minWeight: 100,
   maxWeight: 900,
   duration: 300,
+  useFill: false,
+  fillColor: '#f2553d',
   showTooltip: true,
   tooltipText: '',
 };
 
-function jsxText(word: string) {
-  return /[{}<>]/.test(word) ? `{${JSON.stringify(word)}}` : word;
+type Opt = [name: string, value: string | number | boolean];
+
+/** Options that differ from the defaults, in the order people read them. */
+function changedOptions(s: State): Opt[] {
+  const opts: Opt[] = [];
+  if (!s.loading) opts.push(['value', s.value]);
+  if (s.mode !== 'sweep') opts.push(['mode', s.mode]);
+  if (s.minWeight !== 100) opts.push(['minWeight', s.minWeight]);
+  if (s.maxWeight !== 900) opts.push(['maxWeight', s.maxWeight]);
+  if (s.duration !== 300) opts.push(['duration', s.duration]);
+  if (s.useFill) opts.push(['fillColor', s.fillColor]);
+  if (!s.showTooltip) opts.push(['tooltip', false]);
+  else if (s.tooltipText) opts.push(['tooltip', s.tooltipText]);
+  return opts;
 }
 
-function reactSnippet(s: State) {
-  const props = [`value={${s.value}}`];
-  if (s.mode !== 'sweep') props.push(`mode="${s.mode}"`);
-  if (s.minWeight !== 100) props.push(`minWeight={${s.minWeight}}`);
-  if (s.maxWeight !== 900) props.push(`maxWeight={${s.maxWeight}}`);
-  if (s.duration !== 300) props.push(`duration={${s.duration}}`);
-  if (!s.showTooltip) props.push('tooltip={false}');
-  else if (s.tooltipText) props.push(`tooltip=${JSON.stringify(s.tooltipText)}`);
+const kebab = (name: string) => name.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
+const jsxAttr = ([name, v]: Opt) =>
+  typeof v === 'string' && !v.includes('"')
+    ? `${name}="${v}"`
+    : `${name}={${typeof v === 'string' ? JSON.stringify(v) : v}}`;
+const vueAttr = ([name, v]: Opt) =>
+  typeof v === 'string' ? `${kebab(name)}="${v.replace(/"/g, '&quot;')}"` : `:${kebab(name)}="${v}"`;
+const jsProp = ([name, v]: Opt) => `${name}: ${typeof v === 'string' ? JSON.stringify(v) : v}`;
 
-  return [
+/** One line when short, one attribute per line when long. */
+function tag(open: string, attrs: string[], close: string, indent = '') {
+  const inline = `${open}${attrs.length ? ` ${attrs.join(' ')}` : ''}${close}`;
+  if (inline.length <= 72) return indent + inline;
+  return [`${indent}${open}`, ...attrs.map((a) => `${indent}  ${a}`), `${indent}${close.trimStart()}`].join('\n');
+}
+
+function snippets(s: State): CodeTab[] {
+  const opts = changedOptions(s);
+  const word = s.word || 'USAGE';
+  const jsxWord = /[{}<>]/.test(word) ? `{${JSON.stringify(word)}}` : word;
+
+  const react = [
     "import { GlyphFill } from 'glyphfill/react';",
     "import 'glyphfill/styles.css';",
     '',
-    `<GlyphFill ${props.join(' ')}>${jsxText(s.word)}</GlyphFill>`,
+    tag('<GlyphFill', opts.map(jsxAttr), `>${jsxWord}</GlyphFill>`),
   ].join('\n');
-}
 
-function vanillaSnippet(s: State) {
-  const opts = [`value: ${s.value}`];
-  if (s.mode !== 'sweep') opts.push(`mode: '${s.mode}'`);
-  if (s.minWeight !== 100) opts.push(`minWeight: ${s.minWeight}`);
-  if (s.maxWeight !== 900) opts.push(`maxWeight: ${s.maxWeight}`);
-  if (s.duration !== 300) opts.push(`duration: ${s.duration}`);
-  if (!s.showTooltip) opts.push('tooltip: false');
-  else if (s.tooltipText) opts.push(`tooltip: ${JSON.stringify(s.tooltipText)}`);
+  const vue = [
+    '<script setup>',
+    "import { GlyphFill } from 'glyphfill/vue';",
+    "import 'glyphfill/styles.css';",
+    '</script>',
+    '',
+    '<template>',
+    tag('<GlyphFill', opts.map(vueAttr), `>${word.replace(/[{}<>]/g, '')}</GlyphFill>`, '  '),
+    '</template>',
+  ].join('\n');
 
-  return [
+  const svelte = [
+    '<script>',
+    "  import { GlyphFill } from 'glyphfill/svelte';",
+    "  import 'glyphfill/styles.css';",
+    '</script>',
+    '',
+    tag('<GlyphFill', [...opts.map(jsxAttr), jsxAttr(['text', word])], ' />'),
+  ].join('\n');
+
+  const js = [
     "import { glyphfill } from 'glyphfill';",
     "import 'glyphfill/styles.css';",
     '',
-    `// <span id="word">${s.word}</span>`,
-    `const word = glyphfill(document.getElementById('word'), { ${opts.join(', ')} });`,
+    `// <span id="word">${word}</span>`,
+    `const word = glyphfill(document.getElementById('word'), { ${opts.map(jsProp).join(', ')} });`,
     '',
-    '// later, as the task progresses',
+    s.loading ? '// once progress is known' : '// later, as the task progresses',
     'word.update({ value: 75 });',
   ].join('\n');
+
+  return [
+    { id: 'react', label: 'React', blocks: [{ code: react }] },
+    { id: 'vue', label: 'Vue', blocks: [{ code: vue }] },
+    { id: 'svelte', label: 'Svelte', blocks: [{ code: svelte }] },
+    { id: 'js', label: 'JavaScript', blocks: [{ code: js }] },
+  ];
 }
 
 export function Playground() {
   const [s, setS] = useState<State>(INITIAL);
-  const [tab, setTab] = useState<'react' | 'js'>('react');
   const id = useId();
   const set = <K extends keyof State>(key: K, value: State[K]) => setS((prev) => ({ ...prev, [key]: value }));
   const font = FONTS[s.font] ?? FONTS[0];
@@ -105,7 +151,7 @@ export function Playground() {
 
         <div className="field">
           <label className="field-label" htmlFor={`${id}-value`}>
-            Progress <span className="field-value">{s.value}%</span>
+            Progress <span className="field-value">{s.loading ? 'loading' : `${s.value}%`}</span>
           </label>
           <input
             id={`${id}-value`}
@@ -113,8 +159,13 @@ export function Playground() {
             min={0}
             max={100}
             value={s.value}
+            disabled={s.loading}
             onChange={(e) => set('value', Number(e.target.value))}
           />
+          <label className="check">
+            <input type="checkbox" checked={s.loading} onChange={(e) => set('loading', e.target.checked)} />
+            Not known yet (show loading)
+          </label>
         </div>
 
         <fieldset className="field">
@@ -201,6 +252,23 @@ export function Playground() {
         </div>
 
         <div className="field">
+          <div className="check-row">
+            <label className="check">
+              <input type="checkbox" checked={s.useFill} onChange={(e) => set('useFill', e.target.checked)} />
+              Color the filled letters
+            </label>
+            <input
+              type="color"
+              className="swatch"
+              aria-label="Fill color"
+              value={s.fillColor}
+              disabled={!s.useFill}
+              onChange={(e) => set('fillColor', e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="field">
           <label className="check">
             <input type="checkbox" checked={s.showTooltip} onChange={(e) => set('showTooltip', e.target.checked)} />
             Show tooltip on hover and focus
@@ -208,7 +276,7 @@ export function Playground() {
           <input
             className="input"
             aria-label="Tooltip text"
-            placeholder={`${s.word} · ${s.value}% completed`}
+            placeholder={`${s.word} · ${s.loading ? 'loading' : `${s.value}% completed`}`}
             value={s.tooltipText}
             disabled={!s.showTooltip}
             onChange={(e) => set('tooltipText', e.target.value)}
@@ -223,32 +291,18 @@ export function Playground() {
       <div>
         <div className="stage" style={{ fontFamily: font.css }}>
           <GlyphFill
-            value={s.value}
+            value={s.loading ? undefined : s.value}
             mode={s.mode}
             minWeight={s.minWeight}
             maxWeight={s.maxWeight}
             duration={s.duration}
+            fillColor={s.useFill ? s.fillColor : undefined}
             tooltip={s.showTooltip ? s.tooltipText || true : false}
           >
             {s.word || ' '}
           </GlyphFill>
         </div>
-
-        <div className="tabs" role="tablist" aria-label="Code">
-          <button
-            type="button"
-            role="tab"
-            className="tab"
-            aria-selected={tab === 'react'}
-            onClick={() => setTab('react')}
-          >
-            React
-          </button>
-          <button type="button" role="tab" className="tab" aria-selected={tab === 'js'} onClick={() => setTab('js')}>
-            JavaScript
-          </button>
-        </div>
-        <CodeBlock code={tab === 'react' ? reactSnippet(s) : vanillaSnippet(s)} />
+        <CodeTabs tabs={snippets(s)} label="Code for this example" syncFramework />
       </div>
     </div>
   );

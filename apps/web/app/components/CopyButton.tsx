@@ -2,7 +2,15 @@
 
 import { useEffect, useState } from 'react';
 
-export function CopyButton({ text, className = 'button' }: { text: string; className?: string }) {
+export function CopyButton({
+  text,
+  label = 'Copy',
+  className = 'button',
+}: {
+  text: string;
+  label?: string;
+  className?: string;
+}) {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -15,6 +23,7 @@ export function CopyButton({ text, className = 'button' }: { text: string; class
     <button
       type="button"
       className={className}
+      data-copied={copied || undefined}
       onClick={async () => {
         try {
           await navigator.clipboard.writeText(text);
@@ -24,7 +33,7 @@ export function CopyButton({ text, className = 'button' }: { text: string; class
         }
       }}
     >
-      <span aria-live="polite">{copied ? 'Copied' : 'Copy'}</span>
+      <span aria-live="polite">{copied ? 'Copied' : label}</span>
     </button>
   );
 }

@@ -1,0 +1,32 @@
+# glyphfill
+
+> glyphfill shows progress inside a word. As a task completes, letters get heavier or fill with ink. It ships a React component, a Vue component, a Svelte component and a plain JavaScript function, with no runtime dependencies.
+
+Install with `npm install glyphfill` (or `pnpm add`, `yarn add`, `bun add`), then import `glyphfill/styles.css` once. With Tailwind CSS v4, add `@import "glyphfill/styles.css" layer(components);` to the main CSS file instead.
+
+Entry points:
+
+- `glyphfill/react`: `<GlyphFill value={40}>USAGE</GlyphFill>`
+- `glyphfill/vue`: `<GlyphFill :value="40">USAGE</GlyphFill>`
+- `glyphfill/svelte`: `<GlyphFill value={40} text="USAGE" />`, or the action `use:glyphfill={{ value: 40 }}`
+- `glyphfill`: `glyphfill(element, { value: 40 })` returns `{ update, destroy }`
+
+Options: `value` (0–100; leave it out to show a loading animation), `mode` (`'sweep'` default, `'fill'`, `'weight'`), `minWeight` (100), `maxWeight` (900), `fillColor` (any CSS color), `duration` (ms, 300), `tooltip` (`true`, a string, a function `(word, pct) => string`, or `false`).
+
+Styling: the word inherits font, size and color. glyphfill's rules have zero specificity, so the project's classes win. CSS variables: `--gf-fill`, `--gf-tip-bg`, `--gf-tip-fg`, `--gf-stroke`. Attributes: `data-gf-state` (`loading`, `progress`, `complete`) and `data-gf-mode`.
+
+Sweep and weight modes need a variable font to animate smoothly. Fill mode works with any font.
+
+## Docs
+
+- [Full documentation](https://glyphfill.sush.dev/llms-full.txt): every option, framework examples and styling notes, as plain text
+- [Website and playground](https://glyphfill.sush.dev): live demos of every mode
+
+## Source
+
+- [GitHub repository](https://github.com/sushilburagute/glyphfill)
+- [npm package](https://www.npmjs.com/package/glyphfill)
+
+## Optional
+
+- [Author: Sushil Buragute](https://sush.dev)

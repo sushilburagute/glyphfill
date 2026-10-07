@@ -80,6 +80,31 @@ describe('glyphfill (vanilla)', () => {
     expect(root(el).style.getPropertyValue('--gf-weight')).toBe('');
   });
 
+  it('toggles loading without rebuilding letters', () => {
+    const el = mount('USAGE');
+    const gf = glyphfill(el, { value: null });
+    const first = el.querySelector('.gf__glyph');
+
+    expect(root(el).className).toBe('gf gf--sweep gf--loading');
+    expect(root(el).hasAttribute('aria-valuenow')).toBe(false);
+
+    gf.update({ value: 40 });
+    expect(root(el).className).toBe('gf gf--sweep');
+    expect(root(el).getAttribute('aria-valuenow')).toBe('40');
+    expect(root(el).hasAttribute('aria-busy')).toBe(false);
+    expect(el.querySelector('.gf__glyph')).toBe(first);
+  });
+
+  it('sets fill color and per-letter coverage', () => {
+    const el = mount('USAGE');
+    glyphfill(el, { value: 50, fillColor: 'green' });
+    const glyphs = Array.from(el.querySelectorAll<HTMLElement>('.gf__glyph'));
+
+    expect(root(el).style.getPropertyValue('--gf-fill')).toBe('green');
+    expect(glyphs.map((g) => g.style.getPropertyValue('--gf-t'))).toEqual(['1', '1', '0.5', '0', '0']);
+    expect(glyphs.map((g) => g.style.getPropertyValue('--gf-i'))).toEqual(['0', '1', '2', '3', '4']);
+  });
+
   it('restores the original content on destroy', () => {
     const el = mount('USAGE');
     const text = el.firstChild;

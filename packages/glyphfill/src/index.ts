@@ -1,5 +1,6 @@
 export {
   clampPercent,
+  computeCoverage,
   computeWeight,
   computeWeights,
   DEFAULTS,
@@ -9,5 +10,5 @@ export {
   tooltipText,
 } from './core/compute';
 export { type GlyphFillInstance, glyphfill, type VanillaOptions } from './core/dom';
-export { createModel, type Glyph, type GlyphFillModel } from './core/model';
+export { createModel, type Glyph, type GlyphFillModel, type State } from './core/model';
 export { graphemes } from './core/segment';

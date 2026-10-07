@@ -1,5 +1,5 @@
 import type { GlyphFillOptions } from './compute';
-import { createModel, type GlyphFillModel } from './model';
+import { createModel, type Glyph, type GlyphFillModel } from './model';
 
 export interface VanillaOptions extends GlyphFillOptions {
   /** Text to render. Defaults to the element's text content at mount time. */
@@ -21,26 +21,35 @@ function span(doc: Document, className: string, text?: string): HTMLSpanElement 
   return el;
 }
 
+function styleGlyph(node: HTMLElement, glyph: Glyph, i: number) {
+  node.style.fontWeight = String(glyph.weight);
+  node.style.setProperty('--gf-t', String(glyph.t));
+  node.style.setProperty('--gf-i', String(i));
+}
+
 function buildChildren(doc: Document, model: GlyphFillModel): HTMLSpanElement[] {
   if (model.mode === 'fill') {
     return [span(doc, 'gf__outline', model.text), span(doc, 'gf__ink', model.text)];
   }
   const text = span(doc, 'gf__text');
   if (model.mode === 'sweep') {
-    for (const glyph of model.glyphs) {
+    model.glyphs.forEach((glyph, i) => {
       const g = doc.createElement('span');
       g.className = 'gf__glyph';
-      g.style.fontWeight = String(glyph.weight);
+      styleGlyph(g, glyph, i);
       g.textContent = glyph.char;
       text.append(g);
-    }
+    });
   } else {
     text.textContent = model.text;
   }
   return [span(doc, 'gf__ghost', model.text), text];
 }
 
-/** Render `el`'s text as a glyphfill progress indicator. */
+/**
+ * Render `el`'s text as a glyphfill progress indicator. The `(el, options)`
+ * signature and `{ update, destroy }` return also make this a Svelte action.
+ */
 export function glyphfill(el: HTMLElement, options: VanillaOptions): GlyphFillInstance {
   const doc = el.ownerDocument;
   const original = Array.from(el.childNodes);
@@ -70,7 +79,7 @@ export function glyphfill(el: HTMLElement, options: VanillaOptions): GlyphFillIn
       const nodes = root.querySelectorAll<HTMLElement>('.gf__glyph');
       model.glyphs.forEach((glyph, i) => {
         const node = nodes[i];
-        if (node) node.style.fontWeight = String(glyph.weight);
+        if (node) styleGlyph(node, glyph, i);
       });
     }
   }

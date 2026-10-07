@@ -44,6 +44,31 @@ export function ModeCompare() {
           </div>
         ))}
       </div>
+      <div className="modes modes-extra">
+        <div className="mode">
+          <p className="mode-demo">
+            <GlyphFill value={value} fillColor="var(--marker)">
+              progress
+            </GlyphFill>
+          </p>
+          <h3>
+            <code>fillColor</code>
+          </h3>
+          <p className="mode-what">
+            Filled letters change to any CSS color, so a word can turn your brand color, or green as it nears 100%.
+          </p>
+        </div>
+        <div className="mode">
+          <p className="mode-demo">
+            <GlyphFill>progress</GlyphFill>
+          </p>
+          <h3>No value yet</h3>
+          <p className="mode-what">
+            Leave out <code>value</code> while you wait for real numbers. A wave of weight moves through the word, and
+            screen readers hear that it is loading.
+          </p>
+        </div>
+      </div>
     </>
   );
 }

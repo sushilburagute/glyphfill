@@ -1,10 +1,11 @@
-import { copyFile } from 'node:fs/promises';
 import { defineConfig } from 'tsup';
 
+// styles.css and the Svelte sources are copied by scripts/copy-assets.mjs.
 export default defineConfig({
   entry: {
     index: 'src/index.ts',
     react: 'src/react/index.ts',
+    vue: 'src/vue/index.ts',
   },
   format: ['esm', 'cjs'],
   // tsup's d.ts build sets baseUrl, which TypeScript 6 flags as deprecated.
@@ -12,8 +13,5 @@ export default defineConfig({
   clean: true,
   sourcemap: true,
   target: 'es2022',
-  external: ['react', 'react/jsx-runtime'],
-  onSuccess: async () => {
-    await copyFile('src/styles.css', 'dist/styles.css');
-  },
+  external: ['react', 'react/jsx-runtime', 'vue'],
 });

@@ -1,4 +1,5 @@
 import { render } from '@testing-library/react';
+import { type CSSProperties, createRef } from 'react';
 import { GlyphFill } from '../src/react';
 
 const weights = (container: HTMLElement) =>
@@ -79,5 +80,62 @@ describe('<GlyphFill>', () => {
 
     expect(container.querySelectorAll('.gf__glyph')[2]).toBe(before);
     expect(weights(container)).toEqual(['900', '900', '900', '100', '100']);
+  });
+
+  it('keeps its own state when a Radix asChild parent adds data-state', () => {
+    const { getByRole } = render(
+      <GlyphFill value={100} data-state="closed">
+        USAGE
+      </GlyphFill>,
+    );
+    const bar = getByRole('progressbar');
+
+    expect(bar.getAttribute('data-state')).toBe('closed');
+    expect(bar.getAttribute('data-gf-state')).toBe('complete');
+  });
+
+  it('forwards its ref to the outer span', () => {
+    const ref = createRef<HTMLSpanElement>();
+    render(
+      <GlyphFill ref={ref} value={40}>
+        USAGE
+      </GlyphFill>,
+    );
+
+    expect(ref.current?.getAttribute('role')).toBe('progressbar');
+  });
+
+  it('shows a loading state when value is left out', () => {
+    const { getByRole } = render(<GlyphFill>USAGE</GlyphFill>);
+    const bar = getByRole('progressbar');
+
+    expect(bar.className).toBe('gf gf--sweep gf--loading');
+    expect(bar.getAttribute('data-gf-state')).toBe('loading');
+    expect(bar.getAttribute('aria-busy')).toBe('true');
+    expect(bar.hasAttribute('aria-valuenow')).toBe(false);
+  });
+
+  it('sets fill color and per-letter coverage', () => {
+    const { container } = render(
+      <GlyphFill value={50} fillColor="#16a34a">
+        USAGE
+      </GlyphFill>,
+    );
+    const glyphs = Array.from(container.querySelectorAll<HTMLElement>('.gf__glyph'));
+
+    expect((container.firstElementChild as HTMLElement).style.getPropertyValue('--gf-fill')).toBe('#16a34a');
+    expect(glyphs.map((g) => g.style.getPropertyValue('--gf-t'))).toEqual(['1', '1', '0.5', '0', '0']);
+  });
+
+  it('lets user styles win: style overrides vars, data-state marks completion', () => {
+    const { getByRole } = render(
+      <GlyphFill value={100} style={{ '--gf-tip-bg': 'black' } as CSSProperties}>
+        USAGE
+      </GlyphFill>,
+    );
+    const bar = getByRole('progressbar');
+
+    expect(bar.style.getPropertyValue('--gf-tip-bg')).toBe('black');
+    expect(bar.getAttribute('data-gf-state')).toBe('complete');
   });
 });

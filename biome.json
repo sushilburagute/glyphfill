@@ -6,7 +6,7 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": ["**", "!**/dist", "!**/.next", "!**/.turbo"]
+    "includes": ["**", "!**/dist", "!**/.next", "!**/.turbo", "!**/*.svelte"]
   },
   "formatter": {
     "indentStyle": "space",
