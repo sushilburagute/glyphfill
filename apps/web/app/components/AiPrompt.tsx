@@ -1,5 +1,6 @@
 'use client';
 
+import { Sparkles } from 'lucide-react';
 import { aiPrompt } from '../lib/snippets';
 import { CopyButton } from './CopyButton';
 import { installCommand, usePackageManager } from './choice';
@@ -11,7 +12,10 @@ export function AiPrompt() {
   return (
     <div className="prompt">
       <div className="prompt-head">
-        <span>Prompt</span>
+        <span className="hint">
+          <Sparkles />
+          Prompt
+        </span>
         <CopyButton text={prompt} label="Copy prompt" />
       </div>
       <pre>

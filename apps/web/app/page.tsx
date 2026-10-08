@@ -1,4 +1,5 @@
 import { GlyphFill } from 'glyphfill/react';
+import { ArrowUpRight, BookOpen, MousePointer2, SlidersHorizontal } from 'lucide-react';
 import { AiPrompt } from './components/AiPrompt';
 import { CodeTabs } from './components/CodeTabs';
 import { HeroWord } from './components/Hero';
@@ -57,14 +58,31 @@ export default function Home() {
       />
 
       <header className="site-header wrap">
-        <a className="logo" href="/">
-          glyphfill
-        </a>
+        <div className="brand">
+          <a className="logo" href="/">
+            glyphfill
+          </a>
+          <span className="byline">
+            {'//'} created by <a href={AUTHOR.url}>sush.dev</a>
+          </span>
+        </div>
         <nav className="site-nav" aria-label="Main">
-          <a href="#playground">Playground</a>
-          <a href="#usage">Docs</a>
-          <a href={GITHUB_URL}>GitHub</a>
-          <a href={NPM_URL}>npm</a>
+          <a href="#playground">
+            <SlidersHorizontal />
+            Playground
+          </a>
+          <a href="#usage">
+            <BookOpen />
+            Docs
+          </a>
+          <a href={GITHUB_URL}>
+            GitHub
+            <ArrowUpRight />
+          </a>
+          <a href={NPM_URL}>
+            npm
+            <ArrowUpRight />
+          </a>
         </nav>
       </header>
 
@@ -92,7 +110,10 @@ export default function Home() {
             </GlyphFill>{' '}
             is on track, and your <GlyphFill>report</GlyphFill> is still loading.
           </p>
-          <p className="note">Hover over a word, or Tab to it, to see its exact progress.</p>
+          <p className="note hint">
+            <MousePointer2 />
+            Hover over a word, or Tab to it, to see its exact progress.
+          </p>
         </section>
 
         <section className="section wrap" id="playground" aria-labelledby="playground-title">
@@ -216,10 +237,19 @@ export default function Home() {
           Made by <a href={AUTHOR.url}>{AUTHOR.name}</a>. MIT licensed.
         </p>
         <nav className="footer-nav" aria-label="Project">
-          <a href={GITHUB_URL}>GitHub</a>
-          <a href={NPM_URL}>npm</a>
+          <a href={GITHUB_URL}>
+            GitHub
+            <ArrowUpRight />
+          </a>
+          <a href={NPM_URL}>
+            npm
+            <ArrowUpRight />
+          </a>
           <a href="/llms.txt">llms.txt</a>
-          <a href={AUTHOR.url}>sush.dev</a>
+          <a href={AUTHOR.url}>
+            sush.dev
+            <ArrowUpRight />
+          </a>
         </nav>
       </footer>
     </>

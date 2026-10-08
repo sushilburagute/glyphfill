@@ -1,7 +1,7 @@
 export const SITE_URL = 'https://glyphfill.sush.dev';
 export const GITHUB_URL = 'https://github.com/sushilburagute/glyphfill';
 export const NPM_URL = 'https://www.npmjs.com/package/glyphfill';
-export const AUTHOR = { name: 'Sushil Buragute', url: 'https://sush.dev' } as const;
+export const AUTHOR = { name: 'Sushil Buragute', url: 'https://sush.dev?utm_source=project_glyphfill' } as const;
 
 export const TITLE = 'glyphfill: show progress inside a word';
 export const DESCRIPTION =

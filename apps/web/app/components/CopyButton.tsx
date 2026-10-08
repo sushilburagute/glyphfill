@@ -1,5 +1,6 @@
 'use client';
 
+import { Check, Copy } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export function CopyButton({
@@ -33,6 +34,7 @@ export function CopyButton({
         }
       }}
     >
+      {copied ? <Check /> : <Copy />}
       <span aria-live="polite">{copied ? 'Copied' : label}</span>
     </button>
   );

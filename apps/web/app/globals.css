@@ -2,6 +2,7 @@
    focus; --marker-text is a darker tomato that passes contrast at body size. */
 :root {
   --gutter: clamp(1rem, 4vw, 2.5rem);
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --paper: #e7f0eb;
   --raised: #f3f8f5;
   --ink: #10302a;
@@ -128,6 +129,20 @@ p {
   max-width: 64ch;
 }
 
+/* Lucide icons take the size and color of the text they sit in. */
+.lucide {
+  width: 1em;
+  height: 1em;
+  flex-shrink: 0;
+}
+
+/* A line of text led by an icon. */
+.hint {
+  display: flex;
+  align-items: center;
+  gap: 0.45em;
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -165,10 +180,26 @@ p {
   padding-block: 1.25rem;
 }
 
+.brand {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 0.625rem;
+}
+
 .logo {
   font-weight: 800;
   font-size: 1.125rem;
   text-decoration: none;
+}
+
+.byline {
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.byline a {
+  color: var(--ink);
 }
 
 .site-nav,
@@ -181,7 +212,18 @@ p {
 
 .site-nav a,
 .footer-nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
   text-decoration: none;
+}
+
+/* The arrow marks links that leave the site. */
+.site-nav .lucide-arrow-up-right,
+.footer-nav .lucide-arrow-up-right {
+  width: 0.875em;
+  height: 0.875em;
+  color: var(--muted);
 }
 
 .site-nav a:hover,
@@ -245,7 +287,7 @@ p {
 .hero-meta {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
+  align-items: center;
   gap: 0.25rem 1.5rem;
   margin-top: 1.25rem;
   color: var(--muted);
@@ -332,7 +374,7 @@ p {
 }
 
 .code pre {
-  padding-right: 5.5rem;
+  padding-right: 6.75rem;
 }
 
 .code-caption {
@@ -349,6 +391,10 @@ p {
 }
 
 .button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375em;
   font: inherit;
   font-size: 0.8125rem;
   font-weight: 600;
@@ -358,10 +404,22 @@ p {
   border: 1px solid var(--rule);
   border-radius: 6px;
   cursor: pointer;
+  transition: transform 160ms var(--ease-out);
 }
 
 .button:hover {
   border-color: var(--ink);
+}
+
+.button:active {
+  transform: scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button:active {
+    transform: none;
+    opacity: 0.85;
+  }
 }
 
 .button[data-copied] {

@@ -1,6 +1,7 @@
 'use client';
 
 import { GlyphFill } from 'glyphfill/react';
+import { MoveHorizontal } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 const START = 40;
@@ -38,7 +39,10 @@ export function HeroWord() {
       </div>
       <div className="hero-meta">
         <span className="hero-readout">{value}% completed</span>
-        <span>Drag across the word to change it.</span>
+        <span className="hint">
+          <MoveHorizontal />
+          Drag across the word to change it.
+        </span>
       </div>
     </>
   );

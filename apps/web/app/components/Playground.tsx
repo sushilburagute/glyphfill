@@ -2,6 +2,7 @@
 
 import type { Mode } from 'glyphfill/react';
 import { GlyphFill } from 'glyphfill/react';
+import { RotateCcw } from 'lucide-react';
 import { useId, useState } from 'react';
 import { type CodeTab, CodeTabs } from './CodeTabs';
 
@@ -284,6 +285,7 @@ export function Playground() {
         </div>
 
         <button type="button" className="button" onClick={() => setS(INITIAL)}>
+          <RotateCcw />
           Reset
         </button>
       </form>
