@@ -38,25 +38,6 @@ pnpm dev          # watches the package and runs the site at http://localhost:30
 
 CI runs all of these on every push and pull request (`.github/workflows/ci.yml`).
 
-## Release to npm
-
-Versions and changelogs are managed with [Changesets](https://github.com/changesets/changesets).
-
-1. Describe a change: `pnpm changeset`, pick patch / minor / major, commit the file.
-2. Push to `main`. The Release workflow opens a "Version packages" pull request.
-3. Merge it. The workflow publishes to npm with provenance.
-
-The workflow needs a repository secret `NPM_TOKEN` (an npm automation or granular publish token). To publish by hand instead: `pnpm version-packages && pnpm release` after `npm login`.
-
-## Deploy the site to Vercel
-
-1. Import the repo in Vercel and set **Root Directory** to `apps/web`. `apps/web/vercel.json` installs from the repo root and builds with Turbo, so the package builds first.
-2. Add the domain `glyphfill.sush.dev` under **Settings → Domains**, then add the CNAME record Vercel shows to the `sush.dev` DNS.
-3. Add `NEXT_PUBLIC_GA_ID` (your `G-…` Measurement ID) under **Settings → Environment Variables** for Production. Google Analytics only loads where it's set.
-4. If Vercel's pnpm version doesn't match the lockfile, also add `ENABLE_EXPERIMENTAL_COREPACK=1` so it uses the `packageManager` version.
-
-The site serves `/llms.txt` and `/llms-full.txt` (the package README) for AI assistants, plus `robots.txt`, `sitemap.xml` and Open Graph images.
-
 ## License
 
 MIT © [Sushil Buragute](https://sush.dev)
